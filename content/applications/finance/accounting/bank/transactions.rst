@@ -8,13 +8,46 @@ and reconciling them with the ones recorded in your accounting.
 :doc:`Bank synchronization <bank_synchronization>` automates the process. However, if you do not
 want to use it or if your bank is not yet supported, other options exist:
 
-- :ref:`Import bank transactions <transactions/import>` delivered by your bank;
-- :ref:`Register bank transactions <transactions/register>` manually.
+- :ref:`Import bank transactions <accounting/transactions/import>` delivered by your bank;
+- :ref:`Register bank transactions <accounting/transactions/register>` manually.
 
 .. note::
-   :ref:`Grouping transactions by statement <transactions/statements>` is optional.
+   :ref:`Grouping transactions by statement <accounting/transactions/statements>` is optional.
 
-.. _transactions/import:
+.. _accounting/transactions/view:
+
+Transaction view
+================
+
+Unreconciled transactions display the following information while collapsed:
+
+- The date of the transaction
+- A button linked to the chatter. The icon of this button can vary:
+
+  - The :icon:`fa-comments-o` :guilabel:`(comments)` icon displays only on hover and indicates that
+    there is nothing to declare.
+  - The :icon:`fa-paperclip` :guilabel:`(attachments)` icon indicates that there is an attachment on
+    the journal entry.
+  - The :icon:`fa-clock-o` :guilabel:`(activities)` icon indicates that there is an activity
+    scheduled on the journal entry.
+
+- The label of the transaction
+- The partner of the transaction (if one is set)
+- Up to two :ref:`action buttons <accounting/reconciliation/action-buttons>`, depending on the
+  details of the transaction
+- The balance of the transaction
+
+.. note::
+   - When the chatter of a transaction is open, the active transaction has a blue tag to indicate
+     which transaction's chatter is being displayed.
+   - The chatter can be opened and closed by clicking the :icon:`fa-comments-o`
+     :guilabel:`(comments)` icon and the :icon:`fa-times` :guilabel:`(close)` icon in the top right
+     of the view.
+   - Once a transaction is :doc:`reconciled <reconciliation>`, its action buttons are replaced with
+     the labels of the item(s) it was reconciled with or the account if it was reconciled with the
+     :guilabel:`Set Account` action button.
+
+.. _accounting/transactions/import:
 
 Import transactions
 ===================
@@ -23,40 +56,39 @@ Odoo supports multiple file formats to import transactions:
 
 - SEPA recommended Cash Management format (CAMT.053)
 - Comma-separated values (CSV)
+- Excel (XLSX)
 - Open Financial Exchange (OFX)
 - Quicken Interchange Format (QIF)
 - Belgium: Coded Statement of Account (CODA)
 
-To import a file, go to the :guilabel:`Accounting Dashboard`, and in the :guilabel:`Bank` journal,
-click on :guilabel:`Import File`.
-
-.. tip::
-   Alternatively, you can also:
-
-   - click the :icon:`fa-ellipsis-v` :guilabel:`(ellipsis)` icon on the :guilabel:`Bank`
-     journal and select :guilabel:`Import file`;
-   - or access the transaction list by clicking the :icon:`fa-ellipsis-v` :guilabel:`(ellipsis)`
-     icon on the :guilabel:`Bank` journal and selecting :guilabel:`Transactions`, then click
-     the :icon:`fa-cog` :guilabel:`(gear)` icon and select :guilabel:`Import records`.
-
+To import a file, go to the :guilabel:`Accounting Dashboard`, click the :icon:`fa-ellipsis-v`
+:guilabel:`(ellipsis)` icon on the :guilabel:`Bank` journal, and select :guilabel:`Import file`.
 Next, select the file and upload it.
 
-After setting the necessary formatting options and mapping the file columns with their related Odoo
-fields, you can run a :guilabel:`Test` and :guilabel:`Import` your bank transactions.
+.. tip::
+   Alternatively, access the transaction list by:
+    - clicking on the :guilabel:`Bank` journal, then clicking :guilabel:`Upload`
+    - dragging and dropping a file on the bank journal on the :guilabel:`Accounting Dashboard`
+    - dragging and dropping a file on the transaction reconciliation (kanban) view
+
+Certain file types such as CSV and XLSX, then require setting the necessary formatting options and
+mapping the file columns with their related Odoo fields, after which you can run a :guilabel:`Test`
+and :guilabel:`Import` your bank transactions. Other file types are mapped automatically.
 
 .. seealso::
    :doc:`/applications/essentials/export_import_data`
 
-.. _transactions/register:
+.. _accounting/transactions/register:
 
 Register bank transactions manually
 ===================================
 
-You can also record your bank transactions manually. To do so, go to :guilabel:`Accounting
-Dashboard`, click on the :guilabel:`Bank` journal, and then on :guilabel:`New`. Make sure to fill
-out the :guilabel:`Partner` and :guilabel:`Label` fields to ease the reconciliation process.
+You can also record your bank transactions manually. To do so, go to the :guilabel:`Accounting
+Dashboard`, click on the :guilabel:`Bank` journal, and then on :guilabel:`New`. The
+:guilabel:`Partner` field is optional to ease the reconciliation process, but the :guilabel:`Label`
+and :guilabel:`Date` fields are mandatory.
 
-.. _transactions/statements:
+.. _accounting/transactions/statements:
 
 Statements
 ==========
@@ -77,42 +109,39 @@ To access a list of existing statements, go to the :guilabel:`Accounting Dashboa
 :icon:`fa-ellipsis-v` :guilabel:`(ellipsis)` icon next to the bank or cash journal you want to
 check, then click :guilabel:`Statements`.
 
-.. _transactions/statement-kanban:
+.. _accounting/transactions/statement-kanban:
 
-Statement creation from the kanban view
----------------------------------------
+Statement creation
+------------------
 
-Open the bank reconciliation (kanban) view from the :guilabel:`Accounting Dashboard` by clicking on
-the name of the bank journal and identify the transaction corresponding to the last (most recent)
-transaction of your bank statement. Click on the :guilabel:`Statement` button when hovering on the
-upper separator line to create a statement from that transaction down to the oldest transaction that
-is not yet part of a statement.
+The bank reconciliation view is divided into groups of statements containing different
+transactions. To create a statement, hover on the most recent transaction that should be included in
+the statement, and click the :guilabel:`Statement` button that appears on the upper separator line.
+Doing so creates a statement from that transaction down to the oldest transaction that is not yet
+part of a statement.
 
 .. image:: transactions/statements-kanban.png
-   :alt: A "Statement" button is visible when hovering on the line separating two transactions.
+   :alt: A "Statement" button is visible when hovering on a transaction.
 
 In the :guilabel:`Create Statement` window, fill out the statement's :guilabel:`Reference`, verify
-its :guilabel:`Starting Balance` and :guilabel:`Ending Balance`, and click :guilabel:`Save`.
+its :guilabel:`Starting Balance` and :guilabel:`Ending Balance`, add an attachment such as a PDF
+of the statement if desired, and click :guilabel:`Save`.
 
-.. _transactions/statement-list:
+.. tip::
+   Transactions can also be added to statements from the list view. Select all the transactions
+   corresponding to the bank statement, and, in the :guilabel:`Statement` column, select an existing
+   statement or create a new one by typing its reference, clicking on :guilabel:`Create and
+   edit...`, filling out the statement's details, and saving.
 
-Statement creation from the list view
--------------------------------------
-
-Open the list of transactions by clicking on the name of the bank journal and switching to the list
-view. Select all the transactions corresponding to the bank statement, and, in the
-:guilabel:`Statement` column, select an existing statement or create a new one by typing its
-reference, clicking on :guilabel:`Create and edit...`, filling out the statement's details, and
-saving.
-
-.. _transactions/view-edit-print:
+.. _accounting/transactions/view-edit-print:
 
 Statement viewing, editing, and printing
 ----------------------------------------
 
 To view an existing statement, click on the statement amount in the reconciliation (kanban) view or
-click on the statement name in the bank transaction list view. From here, you can edit the
-:guilabel:`Reference`, :guilabel:`Starting Balance`, or :guilabel:`Ending Balance`.
+click on the statement name and then the :icon:`fa-arrow-right` :guilabel:`(Internal link)` icon in
+the bank transaction list view. From here, you can edit the :guilabel:`Reference`,
+:guilabel:`Starting Balance`, :guilabel:`Ending Balance`, and :guilabel:`Attachments`.
 
 .. note::
    Manually updating the :guilabel:`Starting Balance` automatically updates the :guilabel:`Ending
@@ -126,13 +155,9 @@ click on the statement name in the bank transaction list view. From here, you ca
    the issue. To maintain flexibility, it is still possible to save without first resolving the
    issue.
 
-To attach a digital copy (i.e., JPEG, PNG, or PDF) of the bank statement for enhanced recordkeeping,
-click the :icon:`fa-paperclip` :guilabel:`Attachments` button and select the file to attach.
-
-To generate and print a PDF of the bank statement, click the :guilabel:`Print` button (if accessed
-via the reconciliation view) or click on the :icon:`fa-cog`:guilabel:`(gear)` icon and click
-:icon:`fa-print`:guilabel:`Statement` (if accessed via the list view).
+To generate and print a PDF of the bank statement, click on the :icon:`fa-cog` :guilabel:`(gear)`
+icon and click :icon:`fa-print` :guilabel:`Statement`.
 
 .. note::
    When a bank statement is generated to be printed, it is automatically added to the
-   :guilabel:`Attachments`.
+   :guilabel:`Attachments` if no file was attached when creating the statement.
