@@ -5,15 +5,14 @@ External JSON-2 API
 .. versionadded:: 19.0
 
 Odoo is usually extended internally via modules, but many of its features and all of its data are
-also available from the outside for external analysis or integration with various tools. Part of
-the :ref:`reference/orm/model` API is easily available over HTTP via the ``/json/2`` endpoint.
+also available from the outside for external analysis or integration with various other softwares.
+Part of the :ref:`reference/orm/model` API is easily available over HTTP via the ``/json/2``
+endpoint. The actual models, their fields and methods are specific to every database and can be
+consulted at the ``/doc`` page.
 
-
-Examples
-========
 
 Request
--------
+=======
 
 POST a json object at the ``/json/2/<model>/<method>`` URL. 
 
@@ -27,6 +26,10 @@ POST a json object at the ``/json/2/<model>/<method>`` URL.
    User-Agent: mysoftware python-requests/2.25.1
 
    {
+      "ids": [],
+      "context": {
+         "lang": "en_US"
+      }
       "domain": [
          ["name", "ilike", "%deco%"],
          ["is_company", "=", true]
@@ -34,30 +37,9 @@ POST a json object at the ``/json/2/<model>/<method>`` URL.
       "fields": ["name"],
    }
 
-.. code:: http
-
-   POST /json/2/res.partner/write HTTP/1.1
-   Host: mycompany.odoo.com
-   X-Odoo-Database: mycompany
-   Authorization: Bearer 6578616d706c65206a736f6e20617069206b6579
-   Content-Type: application/json; charset=utf-8
-   User-Agent: mysoftware python-requests/2.25.1
-
-   {
-      "ids": [25],
-      "context": {
-         "lang": "en_US"
-      },
-      "vals_list": [
-         {
-            "name": "Deco Classic"
-         }
-      ]
-   }
-
-The body must be a json-object containing the arguments for the model's method. The two ``ids``
-and ``context`` are special arguments and serve to craft a recordset on which the method is
-executed.
+The body must be a json-object containing the arguments for the model's method. Both ``ids`` and
+``context`` are special arguments: they are used to craft the environment and recordset on which the
+method is executed.
 
 The headers ``Host``, ``Authorization`` (bearer + api key) and ``Content-Type`` are required. The 
 ``X-Odoo-Database`` header is only necessary when multiple databases are hosted behind a same
@@ -68,8 +50,11 @@ The available models and methods depend on the list of modules that are installe
 The exact list of what's available is accessible on the ``/doc`` page of every database.
 
 
-Success response
-----------------
+Response
+========
+
+Success
+-------
 
 A **200 OK** status with the method's return value serialized as json in the body.
 
@@ -83,8 +68,8 @@ A **200 OK** status with the method's return value serialized as json in the bod
    ]
 
 
-Error response
---------------
+Error
+-----
 
 A **4xx**/**5xx** status with the error message serialized as a json string in the body.
 
@@ -99,17 +84,23 @@ A **4xx**/**5xx** status with the error message serialized as a json string in t
 The complete traceback is available in the server log, at the same date as the error response.
 
 
-.. _User-Agent: https://httpwg.org/specs/rfc9110.html#field.user-agent
 
+Database
+========
 
-Authentication & Access Control
-===============================
+Depending on the deploiement, the ``Host`` and/or ``X-Odoo-Database`` request headers might be
+required. The ``Host`` header is required on servers where Odoo is installed next to other web
+applications, so a web-server/reverse-proxy is able to route the request to the Odoo server. The
+``X-Odoo-Database`` header is required when a single Odoo server hosts multiple databases, and that
+:ref:`dbfilter` wasn't configured to use the ``Host`` header.
 
-The JSON-2 API uses the access rights of the current user for all operations, and the user is
-selected using an API key.
+Most HTTP client libraries automatically set the ``Host`` header using the connection url.
+
 
 API Key
--------
+=======
+
+An API key must be set in the ``Authorization`` request header, as a bearer token.
 
 Create a new API key for a user via :guilabel:`Preferences`, :guilabel:`Account Security`, and
 :guilabel:`New API Key`.
@@ -134,10 +125,38 @@ for interactive usage. It is not possible to create keys that last for more than
 that long lasting keys must be rotated at least once every 3 months.
 
 The :guilabel:`Generate Key` creates a 20 bytes (160 bits) strong random key. Its value appears on
-screen, this is the only time and place the key is visible on screen, it must be copied and stored
-somewhere safe. If it ever gets compromized or lost, then it must be removed.
+screen, this is the only time and place the key is visible on screen, it must be copied, kept secret and stored somewhere secure. If it ever gets compromized or lost, then it must be removed.
 
-The `Secrets Management Cheat Sheet`_ is a document published by the OWASP foundation on how to
-safely manage and store secrets such as API keys, with additionnal resources linked at the end.
+Please refer to OWASP's `Secrets Management Cheat Sheet`_ for further guidance on the management of
+API keys.
 
 .. _Secrets Management Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html#secrets-management-cheat-sheet
+
+
+Access Rights
+=============
+
+The JSON-2 API uses the standard :ref:`security <reference/security>` model of Odoo. All operations
+are validated against the access rights, record rules and field accesses granted to the current
+user. The current user is used as well for the :ref:`reference/fields/automatic/log_access`.
+
+For **interfactive usage**, such as discovering the API or running one-time scripts, it is fine to
+use a **personal account**.
+
+For **extended automated usage**, such as an integration with another software, it is recommended to 
+create and use **dedicated bot users**.
+
+Using dedicated bot users has several benefits:
+
+* The minimum required permissions can be granted to the bot, limiting the impact may the API key
+  gets compromised;
+* The password can be set empty to disable login/password authentication, limiting the likelihood
+  the account get compromized;
+* The :ref:`reference/fields/automatic/log_access` use the bot account. No internal user gets
+  impersonalized.
+
+
+Transaction
+===========
+
+.. TODO
